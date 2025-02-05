@@ -12,6 +12,7 @@ fastify.get('/', async function handler(request, reply) {
   try {
     const currentTime = await db.getCurrentTime();
     const version = await db.getVersion();
+    console.log("just a log line", currentTime, version)
     return { hello: 'world', currentTime, version };
   } catch (err) {
     reply.code(500).send({ error: 'Database query failed' });
