@@ -12,8 +12,8 @@ const db = process.env.DATABASE_URL ? new Database(process.env.DATABASE_URL) : n
 // Declare a route
 fastify.get('/', async function handler(request, reply) {
   if (!db) {
-    console.error("DATABASE_URL is not set");
-    return reply.code(200).send({ error: 'DATABASE_URL is not set' });
+    fastify.log.error({ msg: 'Request failed: DATABASE_URL environment variable is not set', url: request.url, method: request.method });
+    return reply.code(500).send({ error: 'Internal server error' });
   }
   try {
     const currentTime = await db.getCurrentTime();
