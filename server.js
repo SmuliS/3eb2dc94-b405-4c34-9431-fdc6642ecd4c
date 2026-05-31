@@ -7,8 +7,14 @@ const fastify = Fastify({
   logger: true
 });
 
+const db = process.env.DATABASE_URL ? new Database(process.env.DATABASE_URL) : null;
+
 // Declare a route
 fastify.get('/', async function handler(request, reply) {
+  if (!db) {
+    console.error("DATABASE_URL is not set");
+    return reply.code(200).send({ error: 'DATABASE_URL is not set' });
+  }
   try {
     const currentTime = await db.getCurrentTime();
     const version = await db.getVersion();
@@ -19,16 +25,11 @@ fastify.get('/', async function handler(request, reply) {
   }
 });
 
-if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is not set");
-  process.exit(1);
-}
-
-const db = new Database(process.env.DATABASE_URL);
-
 (async () => {
   try {
-    await db.connect();
+    if (db) {
+      await db.connect();
+    }
 
     // Run the server!
     console.log("Server is running on port 3000");
